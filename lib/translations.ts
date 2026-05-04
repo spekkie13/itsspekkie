@@ -33,7 +33,7 @@ export const translations = {
     },
     about: {
       eyebrow: "Who is",
-      bio1: "Hey! I'm Spekkie — a Dutch full-time content creator based in the Netherlands. I've been streaming on Twitch and uploading to YouTube for over two years now, mostly playing Clash of Clans and Clash Royale, but you'll occasionally catch me doing something completely random.",
+      bio1: "Hey! I'm Spekkie — a Dutch full-time content creator based in the Netherlands. I've been streaming on Twitch and uploading to YouTube for over six years now, mostly playing Clash of Clans, but you'll occasionally catch me doing something completely random.",
       bio2: "I started streaming as a hobby and it grew into something I genuinely love doing every day. My community is everything — come hang out!",
       watchTwitch: "Watch on Twitch",
       youtube: "YouTube channel",
@@ -151,7 +151,7 @@ export const translations = {
     },
     about: {
       eyebrow: "Wie is",
-      bio1: "Hey! Ik ben Spekkie — een Nederlandse fulltime content creator. Al meer dan twee jaar stream ik op Twitch en upload ik video's op YouTube, voornamelijk Clash of Clans en Clash Royale, maar je kan me zo tegenkomen met iets heel anders.",
+      bio1: "Hey! Ik ben Spekkie — een Nederlandse fulltime content creator. Al meer dan zes jaar stream ik op Twitch en upload ik video's op YouTube, voornamelijk Clash of Clans, maar je kan me zo tegenkomen met iets heel anders.",
       bio2: "Ik begon met streamen als hobby en het is uitgegroeid tot iets wat ik iedere dag met veel plezier doe. Mijn community is alles — kom gezellig langs!",
       watchTwitch: "Kijk op Twitch",
       youtube: "YouTube kanaal",
