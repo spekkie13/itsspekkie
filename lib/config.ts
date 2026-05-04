@@ -1,38 +1,36 @@
 export const siteConfig = {
-  name: "itsspekkie",
-  displayName: "Spekkie",
-  tagline: "Dutch full-time streamer on Twitch & YouTube. Mostly Clash, sometimes chaos.",
-  location: "Netherlands",
+    name: "itsspekkie",
+    displayName: "Spekkie",
+    tagline: "Dutch full-time streamer on Twitch & YouTube. Mostly Clash, sometimes chaos.",
+    location: "Netherlands",
 
-  // Social links — update these
-  socials: {
-    twitch: { handle: "itsSpekkie", url: "https://twitch.tv/itsspekkie" },
-    youtube: { handle: "itsspekkie", url: "https://youtube.com/@itsspekkie" },
-    twitter: { handle: "ItsSpekkie", url: "https://twitter.com/ItsSpekkie" },
-  },
+    socials: {
+        twitch:   { handle: "itsSpekkie",  url: "https://twitch.tv/itsSpekkie" },
+        youtube:  { handle: "itsSpekkie",  url: "https://youtube.com/@itsSpekkie" },
+        twitter:  { handle: "itsSpekkie",  url: "https://twitter.com/itsSpekkie" },
+        tiktok:   { handle: "cocSpekkie",  url: "https://tiktok.com/@cocSpekkie" },
+        discord:  { handle: null,          url: null }, // add invite link when ready
+    },
 
-  // Stats — update or replace with API calls later (labels are in lib/translations.ts)
-  stats: [
-    { value: "2.46K" },
-    { value: "338" },
-    { value: "3×" },
-    { value: "7+" },
-  ],
+    stats: [
+        { value: "2.5K" },
+        { value: "350+" },
+        { value: "3×" },
+        { value: "7+" },
+    ],
 
-  // Stream schedule — null = off
-  schedule: [
-    { day: "Mon", time: null },
-    { day: "Tue", time: "20:00" },
-    { day: "Wed", time: null },
-    { day: "Thu", time: null },
-    { day: "Fri", time: "20:00" },
-    { day: "Sat", time: null },
-    { day: "Sun", time: "20:00" },
-  ],
+    schedule: [
+        { day: "Mon", time: null },
+        { day: "Tue", time: "20:00" },
+        { day: "Wed", time: null },
+        { day: "Thu", time: null },
+        { day: "Fri", time: "20:00" },
+        { day: "Sat", time: null },
+        { day: "Sun", time: "20:00" },
+    ],
 
-  // Merch / donation links
-  merch: {
-    shop: null, // e.g. "https://spekkie.myshopify.com"
-    donation: "https://streamelements.com/itsSpekkie/tip",
-  },
+    merch: {
+        shop: null,
+        donation: "https://streamelements.com/itsSpekkie/tip",
+    },
 };

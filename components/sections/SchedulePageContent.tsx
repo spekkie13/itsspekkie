@@ -2,40 +2,56 @@
 
 import { siteConfig } from "@/lib/config";
 import { useLocale } from "@/lib/locale-context";
+import type { Locale } from "@/lib/translations";
 
-const upcomingStreams = [
-  {
-    id: "1",
-    title: "Ranked grind — wie stopt me?",
-    game: "Clash Royale",
-    day: "Mon",
-    date: "Maandag 24 maart",
-    time: "20:00",
-    duration: "~3 uur",
-  },
-  {
-    id: "2",
-    title: "Clan war live",
-    game: "Clash of Clans",
-    day: "Tue",
-    date: "Dinsdag 25 maart",
-    time: "20:00",
-    duration: "~2.5 uur",
-  },
-  {
-    id: "3",
-    title: "Zaterdag sessie",
-    game: "TBD",
-    day: "Sat",
-    date: "Zaterdag 29 maart",
-    time: "15:00",
-    duration: "~4 uur",
-  },
-];
+const DAY_TO_INDEX: Record<string, number> = {
+  Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+};
+
+function getUpcomingStreams() {
+  const scheduledDays = siteConfig.schedule
+    .filter((s): s is { day: string; time: string } => s.time !== null)
+    .map((s) => ({ dayIndex: DAY_TO_INDEX[s.day], day: s.day, time: s.time }));
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const streams: { date: Date; day: string; time: string }[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const scheduled = scheduledDays.find((s) => s.dayIndex === date.getDay());
+    if (scheduled) {
+      streams.push({ date, day: scheduled.day, time: scheduled.time });
+    }
+  }
+
+  return streams;
+}
+
+function formatDate(date: Date, locale: Locale) {
+  const formatted = date.toLocaleDateString(locale === "nl" ? "nl-NL" : "en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
+function isToday(date: Date) {
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
 
 export function SchedulePageContent() {
-  const { t } = useLocale();
-  const today = new Date().toLocaleDateString("en-US", { weekday: "short" });
+  const { locale, t } = useLocale();
+  const todayShort = new Date().toLocaleDateString("en-US", { weekday: "short" });
+  const upcomingStreams = getUpcomingStreams();
 
   return (
     <div className="pt-28 pb-20 px-6 min-h-screen">
@@ -54,26 +70,26 @@ export function SchedulePageContent() {
           </p>
           <div className="grid grid-cols-7 gap-2">
             {siteConfig.schedule.map(({ day, time }) => {
-              const isToday = day === today;
+              const isTodayCell = day === todayShort;
               return (
                 <div
                   key={day}
                   className={[
                     "rounded-xl p-5 text-center border transition-colors",
                     time
-                      ? isToday
+                      ? isTodayCell
                         ? "bg-gold-400/15 border-gold-400/40"
                         : "bg-white/[0.04] border-white/[0.08]"
                       : "bg-transparent border-white/[0.04] opacity-40",
                   ].join(" ")}
                 >
-                  <p className={`text-[10px] uppercase tracking-widest mb-3 font-semibold ${time ? (isToday ? "text-gold-400" : "text-white/50") : "text-white/20"}`}>
+                  <p className={`text-[10px] uppercase tracking-widest mb-3 font-semibold ${time ? (isTodayCell ? "text-gold-400" : "text-white/50") : "text-white/20"}`}>
                     {day}
                   </p>
                   <p className={`font-display font-bold text-lg ${time ? "text-white" : "text-white/20"}`}>
                     {time ?? "—"}
                   </p>
-                  {isToday && time && (
+                  {isTodayCell && time && (
                     <span className="inline-flex items-center gap-1 mt-2 text-[9px] text-gold-400 uppercase tracking-widest">
                       <span className="w-1 h-1 bg-gold-400 rounded-full animate-blink" />
                       {t.schedulePage.today}
@@ -93,33 +109,34 @@ export function SchedulePageContent() {
           </p>
           <div className="flex flex-col gap-3">
             {upcomingStreams.map((stream) => {
-              const isToday = stream.day === today;
+              const streamIsToday = isToday(stream.date);
               return (
                 <div
-                  key={stream.id}
+                  key={stream.date.toISOString()}
                   className={[
                     "flex flex-col md:flex-row md:items-center gap-4 p-5 rounded-xl border",
-                    isToday
+                    streamIsToday
                       ? "bg-gold-400/10 border-gold-400/30"
                       : "bg-white/[0.03] border-white/[0.06]",
                   ].join(" ")}
                 >
                   {/* Time */}
                   <div className="min-w-[100px]">
-                    <p className={`font-display font-extrabold text-3xl leading-none ${isToday ? "text-gold-400" : "text-white"}`}>
+                    <p className={`font-display font-extrabold text-3xl leading-none ${streamIsToday ? "text-gold-400" : "text-white"}`}>
                       {stream.time}
                     </p>
-                    <p className="text-xs text-white/30 mt-1">{stream.duration}</p>
+                    <p className="text-xs text-white/30 mt-1">CET</p>
                   </div>
 
-                  {/* Info */}
+                  {/* Date */}
                   <div className="flex-1 md:border-l md:border-white/[0.06] md:pl-6">
-                    <p className="text-white font-medium text-base">{stream.title}</p>
-                    <p className="text-xs text-white/40 mt-1">{stream.date} · {stream.game}</p>
+                    <p className="text-white font-medium text-base">
+                      {formatDate(stream.date, locale)}
+                    </p>
                   </div>
 
                   {/* CTA */}
-                  {isToday && (
+                  {streamIsToday && (
                     <a
                       href={siteConfig.socials.twitch.url}
                       target="_blank"
