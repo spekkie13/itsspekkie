@@ -50,6 +50,8 @@ export function EventsContent() {
   const [kothOpen, setKothOpen] = useState(false);
   const [marathonOpen, setMarathonOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (window.location.hash === "#signup") {
@@ -57,9 +59,33 @@ export function EventsContent() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setError(false);
+    const data = new FormData(e.currentTarget);
+    try {
+      const res = await fetch("/api/koth-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          twitchName: data.get("twitchName"),
+          ign: data.get("ign"),
+          playerTag: data.get("playerTag"),
+          townHall: data.get("townHall"),
+          discord: data.get("discord"),
+        }),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -151,6 +177,7 @@ export function EventsContent() {
                           </label>
                           <input
                             type="text"
+                            name="twitchName"
                             placeholder="e.g. itsSpekkie"
                             required
                             className="bg-white/[0.04] border border-white/10 rounded-md text-white text-sm px-4 py-3 outline-none focus:border-gold-400/50 focus:bg-gold-400/[0.03] transition-colors placeholder:text-white/20"
@@ -163,6 +190,7 @@ export function EventsContent() {
                           </label>
                           <input
                             type="text"
+                            name="ign"
                             placeholder={t.events.koth.form.ignPlaceholder}
                             required
                             className="bg-white/[0.04] border border-white/10 rounded-md text-white text-sm px-4 py-3 outline-none focus:border-gold-400/50 focus:bg-gold-400/[0.03] transition-colors placeholder:text-white/20"
@@ -175,6 +203,7 @@ export function EventsContent() {
                           </label>
                           <input
                             type="text"
+                            name="playerTag"
                             placeholder="#ABC123"
                             required
                             className="bg-white/[0.04] border border-white/10 rounded-md text-white text-sm px-4 py-3 outline-none focus:border-gold-400/50 focus:bg-gold-400/[0.03] transition-colors placeholder:text-white/20"
@@ -186,6 +215,7 @@ export function EventsContent() {
                             {t.events.koth.form.townHallLabel}
                           </label>
                           <select
+                            name="townHall"
                             required
                             className="bg-white/[0.04] border border-white/10 rounded-md text-white text-sm px-4 py-3 outline-none focus:border-gold-400/50 transition-colors appearance-none cursor-pointer"
                           >
@@ -204,6 +234,7 @@ export function EventsContent() {
                           </label>
                           <input
                             type="text"
+                            name="discord"
                             placeholder="e.g. spekkie"
                             className="bg-white/[0.04] border border-white/10 rounded-md text-white text-sm px-4 py-3 outline-none focus:border-gold-400/50 focus:bg-gold-400/[0.03] transition-colors placeholder:text-white/20"
                           />
@@ -217,11 +248,17 @@ export function EventsContent() {
                         </span>
                       </label>
 
+                      {error && (
+                        <p className="text-red-400 text-sm">
+                          Something went wrong — please try again.
+                        </p>
+                      )}
                       <button
                         type="submit"
-                        className="bg-gold-400 text-navy-900 font-display font-bold uppercase tracking-widest text-sm px-8 py-3 rounded-md hover:bg-gold-300 transition-colors"
+                        disabled={loading}
+                        className="bg-gold-400 text-navy-900 font-display font-bold uppercase tracking-widest text-sm px-8 py-3 rounded-md hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {t.events.koth.form.submit}
+                        {loading ? "Sending…" : t.events.koth.form.submit}
                       </button>
                     </form>
                   )}
