@@ -28,35 +28,6 @@ export function EventsTeaser() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-          {/* KotH card */}
-          <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden hover:border-gold-400/30 transition-colors">
-            <div className="bg-gold-400/10 border-b border-gold-400/20 px-6 py-4 flex items-center justify-between gap-4">
-              <h3 className="font-display font-extrabold text-xl uppercase text-white tracking-wide">
-                {t.events.koth.name}
-              </h3>
-              <span className="text-xs font-semibold text-gold-400 uppercase tracking-widest shrink-0">
-                {t.events.koth.dateShort}
-              </span>
-            </div>
-            <div className="px-6 py-5">
-              <p className="text-sm text-white/50 leading-relaxed mb-5">
-                {t.events.koth.teaserDescription}
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-white/30 uppercase tracking-widest">
-                  {t.events.koth.prize}
-                </span>
-                <Link
-                  href="/events#signup"
-                  className="text-xs font-semibold text-gold-400 uppercase tracking-widest hover:text-gold-300 transition-colors"
-                >
-                  {t.events.koth.signUp}
-                </Link>
-              </div>
-            </div>
-          </div>
-
           {/* Marathon card */}
           <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden hover:border-gold-400/30 transition-colors">
             <div className="bg-gold-400/10 border-b border-gold-400/20 px-6 py-4 flex items-center justify-between gap-4">
