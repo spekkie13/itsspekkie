@@ -8,6 +8,7 @@ export const translations = {
       clips: "Clips",
       merch: "Merch",
       live: "Live",
+      offline: "Offline",
     },
     hero: {
       eyebrow: "Streamer · Content creator · NL",
@@ -90,6 +91,7 @@ export const translations = {
       clips: "Clips",
       merch: "Merch",
       live: "Live",
+      offline: "Offline",
     },
     hero: {
       eyebrow: "Streamer · Content creator · NL",

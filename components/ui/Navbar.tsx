@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { siteConfig } from "@/lib/config";
 import { useLocale } from "@/lib/locale-context";
+import { LiveButton } from "@/components/ui/LiveButton";
 
 export function Navbar() {
     const [open, setOpen] = useState(false);
@@ -45,17 +46,7 @@ export function Navbar() {
                         {locale === "en" ? "NL" : "EN"}
                     </button>
 
-                    <a
-                        href={siteConfig.socials.twitch.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-gold-400/10 border border-gold-400/30 text-gold-400
-                       text-xs font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full
-                       hover:bg-gold-400/20 transition-colors"
-                    >
-                        <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-blink" />
-                        {t.nav.live}
-                    </a>
+                    <LiveButton />
                 </div>
 
                 {/* Mobile hamburger */}
