@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { signupOverview } from "@/data/signups-overview";
+import { useState, useEffect } from "react";
 
 const marathonDetails = [
     "Timer starts at 7 hours — a nod to 7 years of streaming",
@@ -33,6 +32,10 @@ const timerTable = [
     { action: "€100 Donation",   time: "+140 min" },
 ];
 
+// Toggle this to open/close signups without a redeploy
+const SIGNUP_OPEN = true;
+const EVENT_ID = "marathon_2v2";
+
 interface FormState {
     twitch: string;
     ign: string;
@@ -46,7 +49,7 @@ export function EventsContent() {
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const signupRef = useRef<HTMLDivElement>(null);
+    const [signupCount, setSignupCount] = useState<number | null>(null);
 
     const [form, setForm] = useState<FormState>({
         twitch: "",
@@ -57,9 +60,17 @@ export function EventsContent() {
         agreed: false,
     });
 
+    // Fetch current signup count on load
+    useEffect(() => {
+        fetch(`/api/signup?eventId=${EVENT_ID}`)
+            .then((res) => res.json())
+            .then((data) => setSignupCount(data.total ?? 0))
+            .catch(() => setSignupCount(0));
+    }, []);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-        setForm(prev => ({
+        setForm((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
         }));
@@ -75,7 +86,7 @@ export function EventsContent() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    eventId: "marathon_2v2",
+                    eventId: EVENT_ID,
                     twitch: form.twitch,
                     ign: form.ign,
                     tag: form.tag,
@@ -84,17 +95,17 @@ export function EventsContent() {
                 }),
             });
 
-            if (!res.ok) throw new Error("Submission failed");
+            if (!res.ok)
+                throw new Error("Submission failed");
+
             setSubmitted(true);
+            setSignupCount((prev) => (prev ?? 0) + 1);
         } catch {
             setError("Something went wrong — please try again or contact me on Discord.");
         } finally {
             setLoading(false);
         }
     };
-
-    const isSignupOpen = signupOverview["marathon_2v2"]?.open ?? false;
-    const signupCount = signupOverview["marathon_2v2"]?.total ?? 0;
 
     return (
         <div className="pt-28 pb-20 px-6 min-h-screen">
@@ -108,7 +119,7 @@ export function EventsContent() {
                     Events<span className="text-outline-gold">.</span>
                 </h1>
 
-                {/* ── Marathon ── */}
+                {/* Marathon */}
                 <div className="mb-16">
                     <div className="flex items-center justify-between mb-1">
                         <h2 className="font-display font-extrabold text-4xl uppercase text-white">
@@ -164,24 +175,21 @@ export function EventsContent() {
                     </div>
 
                     {/* 2v2 Signup */}
-                    <div
-                        id="signup"
-                        ref={signupRef}
-                        className="bg-white/[0.03] border border-gold-400/20 rounded-xl p-8"
-                    >
+                    <div id="signup" className="bg-white/[0.03] border border-gold-400/20 rounded-xl p-8">
                         <h3 className="font-display font-extrabold text-3xl uppercase text-white mb-1">
                             🆚 2v2 Tournament Signup
                         </h3>
                         <p className="text-white/40 text-sm mb-2">
                             Legend mode · Part of the marathon stream
                         </p>
-                        {isSignupOpen && (
+
+                        {SIGNUP_OPEN && signupCount !== null && (
                             <p className="text-gold-400 text-sm font-semibold mb-8">
                                 {signupCount} {signupCount === 1 ? "player" : "players"} signed up so far
                             </p>
                         )}
 
-                        {!isSignupOpen ? (
+                        {!SIGNUP_OPEN ? (
                             <div className="bg-white/[0.03] border border-white/10 rounded-lg px-6 py-4 inline-block">
                                 <p className="font-display font-bold text-xl uppercase text-white/40 tracking-wide">
                                     Signups not open yet — check back soon
@@ -262,7 +270,7 @@ export function EventsContent() {
                                  appearance-none cursor-pointer"
                                         >
                                             <option value="" disabled>Select TH level</option>
-                                            {Array.from({ length: 9 }, (_, i) => i + 10).map(th => (
+                                            {Array.from({ length: 9 }, (_, i) => i + 10).map((th) => (
                                                 <option key={th} value={`TH${th}`}>Town Hall {th}</option>
                                             ))}
                                         </select>

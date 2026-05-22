@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
-import fs from "fs";
-import path from "path";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
@@ -9,51 +7,14 @@ async function getSheetClient() {
     const auth = new google.auth.GoogleAuth({
         credentials: {
             client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+            private_key: (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
         },
         scopes: SCOPES,
     });
     return google.sheets({ version: "v4", auth });
 }
 
-function updateOverviewFile(eventId: string) {
-    const filePath = path.join(process.cwd(), "data", "signups-overview.ts");
-    const content = fs.readFileSync(filePath, "utf-8");
-
-    // Find the event entry and increment the total
-    const updated = content.replace(
-        new RegExp(`(${eventId}:\\s*{\\s*total:\\s*)(\\d+)`),
-        (match, prefix, count) => `${prefix}${parseInt(count) + 1}`
-    );
-
-    fs.writeFileSync(filePath, updated);
-}
-
-function updateDetailFile(
-    eventId: string,
-    signup: {
-        twitch: string;
-        ign: string;
-        tag: string;
-        th: string;
-        discord: string;
-        submittedAt: string;
-    }
-) {
-    const filePath = path.join(process.cwd(), "data", "signups-detail.ts");
-    const content = fs.readFileSync(filePath, "utf-8");
-
-    const newEntry = `    { twitch: "${signup.twitch}", ign: "${signup.ign}", tag: "${signup.tag}", th: "${signup.th}", discord: "${signup.discord}", submittedAt: "${signup.submittedAt}" },`;
-
-    // Insert before the closing bracket of the event array
-    const updated = content.replace(
-        new RegExp(`(${eventId}:\\s*\\[)([^\\]]*)(\\])`),
-        (match, open, entries, close) => `${open}${entries}${newEntry}\n  ${close}`
-    );
-
-    fs.writeFileSync(filePath, updated);
-}
-
+// POST — submit a signup
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
@@ -68,7 +29,6 @@ export async function POST(req: NextRequest) {
 
         const submittedAt = new Date().toISOString();
 
-        // Write to Google Sheets
         const sheets = await getSheetClient();
         await sheets.spreadsheets.values.append({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
@@ -79,13 +39,53 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // Update local data files
-        updateOverviewFile(eventId);
-        updateDetailFile(eventId, { twitch, ign, tag, th, discord: discord || "", submittedAt });
-
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Signup error:", error);
+        return NextResponse.json(
+            { error: "Something went wrong" },
+            { status: 500 }
+        );
+    }
+}
+
+// GET — read signup count and entries for an event
+export async function GET(req: NextRequest) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const eventId = searchParams.get("eventId");
+
+        if (!eventId) {
+            return NextResponse.json({ error: "Missing eventId" }, { status: 400 });
+        }
+
+        const sheets = await getSheetClient();
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range: "Blad1!A:G",
+        });
+
+        const rows = response.data.values || [];
+
+        // Filter rows matching this eventId (skip header row if present)
+        const signups = rows
+            .filter((row) => row[0] === eventId)
+            .map((row) => ({
+                twitch: row[1] || "",
+                ign: row[2] || "",
+                tag: row[3] || "",
+                th: row[4] || "",
+                discord: row[5] || "",
+                submittedAt: row[6] || "",
+            }));
+
+        return NextResponse.json({
+            eventId,
+            total: signups.length,
+            signups,
+        });
+    } catch (error) {
+        console.error("Signup read error:", error);
         return NextResponse.json(
             { error: "Something went wrong" },
             { status: 500 }
