@@ -8,8 +8,8 @@ export const siteConfig = {
         twitch:   { handle: "itsSpekkie",  url: "https://twitch.tv/itsSpekkie" },
         youtube:  { handle: "itsSpekkie",  url: "https://youtube.com/@itsSpekkie" },
         twitter:  { handle: "itsSpekkie",  url: "https://twitter.com/itsSpekkie" },
-        tiktok:   { handle: "cocSpekkie",  url: "https://tiktok.com/@cocSpekkie" },
-        discord:  { handle: null,          url: null }, // add invite link when ready
+        tiktok:   { handle: "itsSpekkie",  url: "https://tiktok.com/@itsSpekkie" },
+        discord:  { handle: "Spekkie's Hangout",          url: "https://discord.gg/jRwS67BZGr" }, // add invite link when ready
     },
 
     stats: [

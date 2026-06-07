@@ -14,7 +14,7 @@ export function Navbar() {
         { label: t.nav.about,    href: "/about" },
         { label: t.nav.schedule, href: "/schedule" },
         { label: "Events",       href: "/events" },
-        { label: t.nav.merch,    href: siteConfig.merch.shop ?? siteConfig.merch.donation },
+        { label: "Links",        href: "/links" },
     ];
 
     return (
